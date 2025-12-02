@@ -1,4 +1,4 @@
-// Package main solves Advent of Code 2025 Day 2 puzzle part 1.
+// Package main solves Advent of Code 2025 Day 2 puzzle part 2.
 package main
 
 import (
