@@ -11,8 +11,8 @@ import (
 func main() {
 	// We need to enter a door with a password.
 	// There is a safe with a dial on it. ranging from 0 to 99.
-	
-	// The safe is actually a decoy. 
+
+	// The safe is actually a decoy.
 	// The actual password is the number of times the dial is left pointing at 0 after any rotation in the sequence.
 
 	// Our starting position is 50
@@ -50,7 +50,7 @@ func main() {
 func parseInstruction(instruction string) (byte, int) {
 	// The direction is the first character of the instruction.
 	direction := instruction[0]
-	
+
 	// Check if the direction is valid.
 	if direction != 'R' && direction != 'L' {
 		log.Fatalf("Invalid direction: %s", direction)
