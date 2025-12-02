@@ -63,14 +63,32 @@ func validateProductId(productId int) bool {
 	// Convert the productId to a string
 	productIdString := strconv.Itoa(productId)
 
-	// split the string through the middle
-	leftSide := productIdString[:len(productIdString)/2]
-	rightSide := productIdString[len(productIdString)/2:]
+	// An ID is invalid if the ENTIRE ID is made of the same sequence repeated at least twice
+	// So we need to check if the string can be divided evenly by a sequence length
+	// and if the entire string is composed of that sequence repeated
 
-	// Check if the left side is equal to the right side (exact match)
-	if leftSide == rightSide {
-		return false
+	// Try each possible sequence length from 1 to half the string length
+	maxSequenceLength := len(productIdString) / 2
+
+	// Loop through all possible sequence lengths
+	for seqLength := 1; seqLength <= maxSequenceLength; seqLength++ {
+
+		// Get the first sequence
+		firstSequence := productIdString[:seqLength]
+
+		// Check if the entire string is made of this sequence repeated
+		// Calculate how many times the sequence should repeat
+		repeatCount := len(productIdString) / seqLength
+
+		// Build the expected string by repeating the first sequence
+		expectedString := strings.Repeat(firstSequence, repeatCount)
+
+		// If the entire string matches the repeated sequence, it's invalid
+		if productIdString == expectedString {
+			return false
+		}
 	}
 
+	// default to valid productId
 	return true
 }
