@@ -1,15 +1,17 @@
-// Package main solves Advent of Code 2025 Day 4 puzzle part 1.
+// Package main solves Advent of Code 2025 Day 4 puzzle part 2.
 package main
 
 import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 )
 
 var rows []string
 var maxColumnIndex int
+var paperRollAbleToRemove int
 
 func main() {
 	// Read the input.txt file and parse the product ranges
@@ -20,11 +22,16 @@ func main() {
 
 	rows = strings.Split(string(inputData), "\n")
 
-	// Paper roll is accessable
-	var paperRollAccessible int
-
 	// first we determine the max column length
 	maxColumnIndex = len(rows[0]) - 1
+
+	cleanPaperRolls()
+
+	fmt.Println(paperRollAbleToRemove)
+}
+
+func cleanPaperRolls() {
+	var paperRollsToRemove []string
 
 	// Loop through all the rows and then all the columns
 	for rowIndex, row := range rows {
@@ -32,13 +39,34 @@ func main() {
 			// if the column is a '.' skip it.
 			if column == '@' {
 				if checkPaperRoll(rowIndex, columnIndex) {
-					paperRollAccessible++
+					paperRollAbleToRemove++
+
+					//mark rowIndex + columnIndex for removal by adding it to the paperRollsToRemove slice
+					paperRollsToRemove = append(paperRollsToRemove, fmt.Sprintf("%d,%d", rowIndex, columnIndex))
 				}
 			}
 		}
 	}
 
-	fmt.Println(paperRollAccessible)
+	if len(paperRollsToRemove) > 0 {
+		// Remove the paper Towels
+		removePaperRolls(paperRollsToRemove)
+
+		// Recursivly recall the cleanPaperRolls with the new rows variable
+		cleanPaperRolls()
+	}
+}
+
+func removePaperRolls(paperRollsToRemove []string) {
+
+	for _, paperRoll := range paperRollsToRemove {
+		rowIndex, _ := strconv.Atoi(strings.Split(paperRoll, ",")[0])
+		columnIndex, _ := strconv.Atoi(strings.Split(paperRoll, ",")[1])
+
+		// Rebuild the string by slicing and concatenating (strings are immutable in Go :( sad face)
+		row := rows[rowIndex]
+		rows[rowIndex] = row[:columnIndex] + "X" + row[columnIndex+1:]
+	}
 }
 
 func checkPaperRoll(rowIndex int, columnIndex int) bool {

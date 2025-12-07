@@ -9,6 +9,43 @@ import (
 	"strings"
 )
 
+// findNumbers recursively finds the highest digits starting from startIndex
+// We need to select exactly 'count' digits, so we need at least (count-1) digits remaining after each selection
+func findNumbers(bank string, startIndex int, count int) []int {
+	if count == 0 {
+		return []int{}
+	}
+
+	// We need at least 'count' digits remaining total
+	if startIndex >= len(bank) || len(bank)-startIndex < count {
+		return []int{}
+	}
+
+	var highestDigit int
+	highestDigitIndex := -1
+
+	// Find the highest digit we can select while ensuring we can still select (count-1) more digits
+	// We can only search up to len(bank) - (count-1) to ensure enough digits remain
+	maxIndex := len(bank) - (count - 1)
+	for index := startIndex; index < maxIndex; index++ {
+		digit, _ := strconv.Atoi(string(bank[index]))
+
+		// Select the highest digit available
+		if digit > highestDigit {
+			highestDigit = digit
+			highestDigitIndex = index
+		}
+	}
+
+	// If we found a digit, recursively find the remaining digits
+	if highestDigitIndex >= 0 {
+		remainingDigits := findNumbers(bank, highestDigitIndex+1, count-1)
+		return append([]int{highestDigit}, remainingDigits...)
+	}
+
+	return []int{}
+}
+
 func main() {
 	// Read the input.txt file and parse the product ranges
 	banks, err := os.ReadFile("input.txt")
@@ -20,45 +57,21 @@ func main() {
 
 	// Loop through the banks, there is one instruction per line.
 	for _, bank := range strings.Split(string(banks), "\n") {
-		// Find the highest two numbers in the bank
+		// Find 12 numbers recursively
+		numbers := findNumbers(bank, 0, 12)
 
-		// Loop through all the characters of the string and store the value found
-		// If the value is (parsed to int) greater than the value that is found, update the value
-
-		var firstHighestNumber int
-		var firstHighestNumberIndex int
-
-		// Loop through the bank a first time
-		for index, char := range bank {
-			numberFound, _ := strconv.Atoi(string(char))
-
-			// The current position should have atleast 11 chars after it
-			if numberFound > firstHighestNumber && len(bank)-(index+1) < 12 {
-				firstHighestNumber = numberFound
-				firstHighestNumberIndex = index
-			}
+		// Paste all numbers together
+		var combinedNumberString string
+		for _, num := range numbers {
+			combinedNumberString += strconv.Itoa(num)
 		}
 
-		// Now do it again to get the remaining 11 numbers
-		for _, char := range bank[firstHighestNumberIndex:] {
-			numberFound, _ := strconv.Atoi(string(char))
-
-			// Loop throught the remaing
-
-		}
-
-		// Paste the two numbers together
-		combinedNumberString := strconv.Itoa(firstHighestNumber) + strconv.Itoa(secondHighestNumber)
-
-		// Convert the pasted numbers to a int
+		// Convert the pasted numbers to an int
 		parsedCombinedNumber, _ := strconv.Atoi(combinedNumberString)
-
-		fmt.Println((parsedCombinedNumber))
 
 		// Add the int amount to total
 		totalAmount += parsedCombinedNumber
 	}
 
-	fmt.Println((totalAmount))
-
+	fmt.Println(totalAmount)
 }
